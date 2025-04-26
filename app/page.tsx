@@ -1,103 +1,125 @@
+"use client"
+
 import Image from "next/image";
+import MapboxMap from "@/lib/components/map";
+import Sidebar from "@/lib/components/sidebar";
+import { useState } from "react";
+
+// Define the marker data interface
+interface MarkerData {
+  id?: string;
+  latitude: number;
+  longitude: number;
+  name: string;
+  type: string;
+  data: any;
+  color?: string;
+}
 
 export default function Home() {
+  const [mapCenter, setMapCenter] = useState([1, 2, 9]);
+  const [selectedMarker, setSelectedMarker] = useState<MarkerData | null>(null);
+  const [showDataModal, setShowDataModal] = useState(false);
+  
+  // Sample marker data
+  const [markerData, setMarkerData] = useState<MarkerData[]>([
+    {
+      id: "marker-1",
+      latitude: 37.8,
+      longitude: -122.4,
+      name: "Defense Site Alpha",
+      type: "Radar Station",
+      data: { status: "Active", personnel: 45, established: "2018-05-10" },
+      color: "#FFFFFF"
+    },
+    {
+      id: "marker-2",
+      latitude: 37.8248,
+      longitude: -122.37,
+      name: "Naval Base Bravo",
+      type: "Supply Depot",
+      data: { status: "Standby", personnel: 120, established: "2015-11-22" },
+      color: "#FFFFFF"
+    },
+    {
+      id: "marker-3",
+      latitude: 37.81,
+      longitude: -122.39,
+      name: "Outpost Charlie",
+      type: "Communications",
+      data: { status: "Active", personnel: 15, established: "2020-03-17" },
+      color: "#FFFFFF"
+    }
+  ]);
+  
+  // Handle viewing marker data
+  const handleViewMarkerData = (marker: MarkerData) => {
+    setSelectedMarker(marker);
+    setShowDataModal(true);
+  };
+  
+  // Close the data modal
+  const closeDataModal = () => {
+    setShowDataModal(false);
+    setSelectedMarker(null);
+  };
+  
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="h-screen w-full flex relative">
+      <MapboxMap 
+        setData={setMapCenter} 
+        data={mapCenter}
+        markerData={markerData}
+        onViewData={handleViewMarkerData}
+      />
+      <Sidebar data={markerData}/>
+      
+      {/* Modal for viewing marker data */}
+      {showDataModal && selectedMarker && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-black bg-opacity-70" onClick={closeDataModal}></div>
+          <div className="bg-white p-6 rounded-lg border-2 border-black shadow-lg z-10 max-w-md w-full">
+            <div className="flex justify-between items-center mb-4 border-b border-gray-800 pb-3">
+              <h2 className="text-2xl font-bold">{selectedMarker.name}</h2>
+              <button 
+                onClick={closeDataModal}
+                className="text-black hover:text-gray-700 focus:outline-none"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            
+            <div className="mb-4">
+              <p className="text-gray-900 mb-2"><span className="font-semibold">Type:</span> {selectedMarker.type}</p>
+              <p className="text-gray-900"><span className="font-semibold">Location:</span> {selectedMarker.latitude.toFixed(4)}, {selectedMarker.longitude.toFixed(4)}</p>
+            </div>
+            
+            <div className="border-t border-gray-300 pt-4 mb-6">
+              <h3 className="text-xl font-semibold mb-3">Details</h3>
+              <div className="bg-gray-100 p-3 rounded">
+                {Object.entries(selectedMarker.data).map(([key, value]) => (
+                  <p key={key} className="mb-2 flex justify-between">
+                    <span className="font-medium capitalize">{key}:</span> 
+                    <span className="text-gray-800">{String(value)}</span>
+                  </p>
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex justify-end">
+              <button 
+                onClick={closeDataModal}
+                className="bg-black hover:bg-gray-800 text-white px-6 py-2 rounded"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      )}
     </div>
   );
 }
