@@ -1,5 +1,6 @@
 import { openai } from '@ai-sdk/openai';
 import { anthropic } from '@ai-sdk/anthropic';
+import { groq } from '@ai-sdk/groq';
 import { streamText } from 'ai';
 
 export const maxDuration = 30;
@@ -24,7 +25,7 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model: sdkModel,
-    system: 'Data is provided. If the user needs to know more about the data, use the data to answer the question.',
+    system: 'Data is provided. If the user needs to know more about the data, use the data to answer the question. Do not respond in Markdown, only text. use newline characters freely.',
     messages,
   });
 

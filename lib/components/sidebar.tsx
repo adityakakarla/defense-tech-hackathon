@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, ChangeEvent, useRef } from "react"
-import { ChevronLeft, ChevronRight, ArrowUp } from "lucide-react"
+import { ChevronLeft, ChevronRight, ArrowUp, Volume2, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useChat } from '@ai-sdk/react';
 import {
@@ -22,6 +22,14 @@ export default function Sidebar({ data }: { data: any }) {
     const initialXRef = useRef(0)
     const initialWidthRef = useRef(0)
     const currentWidthRef = useRef(width)
+    const [model, setModel] = useState("gpt-4o-mini")
+    const [isAudioLoading, setIsAudioLoading] = useState(false)
+    const modelOptions = [
+        'gpt-4o-mini',
+        'gpt-4o',
+        'claude-3.5-sonnet',
+        'claude-3.7-sonnet'
+    ]
 
     // Keep currentWidthRef in sync with width state
     useEffect(() => {
@@ -69,16 +77,11 @@ export default function Sidebar({ data }: { data: any }) {
 
         const handleMouseMove = (e: MouseEvent) => {
             if (!isDraggingRef.current) return;
-
-            // Calculate width based on how far mouse has moved from initial position
             const deltaX = initialXRef.current - e.clientX;
             let newWidth = initialWidthRef.current + deltaX;
+            newWidth = Math.max(newWidth, 256);
+            newWidth = Math.min(newWidth, 1000);
 
-            // Enforce min/max width constraints
-            newWidth = Math.max(newWidth, 256); // Min width: 256px
-            newWidth = Math.min(newWidth, 600); // Max width: 600px
-
-            // Update width directly on the element for smoother resizing
             if (sidebarRef.current) {
                 sidebarRef.current.style.width = `${newWidth}px`;
                 currentWidthRef.current = newWidth;
@@ -113,13 +116,7 @@ export default function Sidebar({ data }: { data: any }) {
         };
     }, [isExpanded]);
 
-    const [model, setModel] = useState("gpt-4o-mini")
-    const modelOptions = [
-        'gpt-4o-mini',
-        'gpt-4o',
-        'claude-3.5-sonnet',
-        'claude-3.7-sonnet'
-    ]
+
     return (
         <div className="flex h-screen">
             {/* Resize handle - positioned on left side */}
@@ -148,8 +145,42 @@ export default function Sidebar({ data }: { data: any }) {
                     >
                         {isExpanded ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
                     </button>
-                    {isExpanded && <div>
+                    {isExpanded && <div className="flex items-center gap-2">
                         <h2 className="text-lg font-semibold">Agent</h2>
+                        <button
+                            disabled={isAudioLoading}
+                            className="hover:text-gray-600 transition duration-150 flex items-center justify-center"
+                            onClick={async () => {
+                                try {
+                                    setIsAudioLoading(true);
+                                    const response = await fetch("/api/dispatch", {
+                                        method: "POST",
+                                        body: JSON.stringify({
+                                            messages: messages
+                                        })
+                                    });
+                                    const audio = await response.blob();
+                                    console.log('blob');
+                                    const audioUrl = URL.createObjectURL(audio);
+                                    console.log('audioUrl');
+                                    const audioElement = new Audio(audioUrl);
+                                    console.log('audioElement');
+                                    await audioElement.play();
+                                    console.log('Playback started successfully.');
+                                    console.log('audioElement.play()');
+                                } catch (error) {
+                                    console.error('Playback failed:', error);
+                                } finally {
+                                    setIsAudioLoading(false);
+                                }
+                            }}
+                        >
+                            {isAudioLoading ? (
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                            ) : (
+                                <Volume2 className="h-5 w-5" />
+                            )}
+                        </button>
                     </div>}
                 </div>
 
@@ -165,9 +196,9 @@ export default function Sidebar({ data }: { data: any }) {
                         </div>
 
                         <div className="p-2 border-t shrink-0">
-                            <Select onValueChange={(value) => setModel(value)}>
+                            <Select onValueChange={(value) => setModel(value)} defaultValue="gpt-4o-mini">
                                 <SelectTrigger className="w-[180px] rounded-none border border-black text-black my-2">
-                                    <SelectValue placeholder="Model" className="text-black"/>
+                                    <SelectValue placeholder="Model" className="text-black" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {modelOptions.map(option => (
