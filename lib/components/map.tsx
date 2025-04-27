@@ -22,14 +22,11 @@ interface MapClickEvent {
 const MapboxMap = ({
   initialCenter = [-122.4, 37.8],
   initialZoom = 12,
-  width = '100%',
-  height = '100%',
   markerData = [] as MarkerData[],
   onMapClick = (event: MapClickEvent) => {},
   mapStyle = 'mapbox://styles/mapbox/satellite-v9',
-  setData = (data: any) => {},
-  data = [] as any,
-  onViewData = (markerData: MarkerData) => {}
+  onViewData = (markerData: MarkerData) => {},
+  setSensorBeingViewed = (sensorBeingViewed: number) => {}
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -61,7 +58,6 @@ const MapboxMap = ({
       setLng(longitude);
       setLat(latitude);
       setZoom(zoom);
-      setData([longitude, latitude, zoom]);
     });
 
     map.current.on('click', (e: mapboxgl.MapMouseEvent) => {
@@ -101,15 +97,14 @@ const MapboxMap = ({
         <path d="M6 9L12 15L18 9" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px #000000) drop-shadow(0 0 2px #000000)"/>
       </svg>`;
       
-      // Create popup content with marker info and a view data button
+      // Create popup content with marker info and directly display the data
       const popupContent = `
         <div class="marker-popup">
-          <h3 class="text-lg font-bold">${marker.name}</h3>
-          <p class="text-sm text-gray-600">${marker.type}</p>
-          <button class="view-data-btn bg-black text-white px-3 py-2 rounded mt-3 text-sm w-full" 
-                  data-marker-id="${id}">
-            View Data
-          </button>
+          <h3 class="text-xl font-bold mb-2">${marker.name}</h3>
+          <p class="text-base text-gray-600 mb-3">${marker.type}</p>
+          <div class="marker-data mt-4 p-3 bg-gray-100 rounded overflow-auto max-h-96">
+            <pre>${JSON.stringify(marker.data, null, 2)}</pre>
+          </div>
         </div>
       `;
       
@@ -130,25 +125,13 @@ const MapboxMap = ({
       
       // Store reference to the marker
       markerRefs.current[id] = mapMarker;
-      
-      // Add event listener for the View Data button
-      popup.on('open', () => {
-        setTimeout(() => {
-          const button = document.querySelector(`.view-data-btn[data-marker-id="${id}"]`);
-          if (button) {
-            button.addEventListener('click', () => {
-              onViewData(marker);
-            });
-          }
-        }, 100);
-      });
     });
   };
 
   // Call addMarkersToMap when map is loaded or markerData changes
   useEffect(() => {
     addMarkersToMap();
-  }, [mapLoaded, markerData, onViewData]);
+  }, [mapLoaded, markerData]);
 
   return (
     <div className="relative h-full w-full">
@@ -176,27 +159,42 @@ const MapboxMap = ({
         }
         
         .marker-popup {
-          padding: 12px;
-          min-width: 180px;
+          padding: 20px;
           color: #000;
+          width: 100%;
         }
         
-        .view-data-btn:hover {
-          background-color: #333;
+        .marker-data {
+          max-height: 500px;
+          overflow-y: auto;
+          white-space: pre-wrap;
+          word-break: break-word;
+          font-family: monospace;
+          font-size: 14px;
         }
         
         .black-white-popup .mapboxgl-popup-content {
           background-color: white;
           color: black;
           border: 2px solid black;
-          border-radius: 4px;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          border-radius: 8px;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+          width: 700px;
+          max-width: 90vw;
+          padding: 5px;
+        }
+        
+        .black-white-popup .mapboxgl-popup {
+          max-width: 90vw !important;
+          width: auto !important;
         }
         
         .black-white-popup .mapboxgl-popup-close-button {
           color: black;
-          font-size: 18px;
-          padding: 4px 8px;
+          font-size: 24px;
+          padding: 8px 12px;
+          right: 5px;
+          top: 5px;
         }
         
         .black-white-popup .mapboxgl-popup-tip {

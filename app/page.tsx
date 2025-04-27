@@ -5,7 +5,6 @@ import MapboxMap from "@/lib/components/map";
 import Sidebar from "@/lib/components/sidebar";
 import { useState } from "react";
 
-// Define the marker data interface
 interface MarkerData {
   id?: string;
   latitude: number;
@@ -20,34 +19,34 @@ export default function Home() {
   const [mapCenter, setMapCenter] = useState([1, 2, 9]);
   const [selectedMarker, setSelectedMarker] = useState<MarkerData | null>(null);
   const [showDataModal, setShowDataModal] = useState(false);
+  const [sensorBeingViewed, setSensorBeingViewed] = useState(-1);
   
-  // Sample marker data
   const [markerData, setMarkerData] = useState<MarkerData[]>([
     {
       id: "marker-1",
       latitude: 37.8,
       longitude: -122.4,
-      name: "Defense Site Alpha",
-      type: "Radar Station",
-      data: { status: "Active", personnel: 45, established: "2018-05-10" },
+      name: "Call #107",
+      type: "Phone Call",
+      data: { transcript: "hi"},
       color: "#FFFFFF"
     },
     {
       id: "marker-2",
       latitude: 37.8248,
       longitude: -122.37,
-      name: "Naval Base Bravo",
-      type: "Supply Depot",
-      data: { status: "Standby", personnel: 120, established: "2015-11-22" },
+      name: "Yerba Buena Island",
+      type: "SDR Sensor",
+      data: { frequency: 900},
       color: "#FFFFFF"
     },
     {
       id: "marker-3",
       latitude: 37.81,
       longitude: -122.39,
-      name: "Outpost Charlie",
-      type: "Communications",
-      data: { status: "Active", personnel: 15, established: "2020-03-17" },
+      name: "San Francisco Bay Sensor 3",
+      type: "Ultrasonic Wind Sensor",
+      data: { windSpeed: 15},
       color: "#FFFFFF"
     }
   ]);
@@ -67,10 +66,9 @@ export default function Home() {
   return (
     <div className="h-screen w-full flex relative">
       <MapboxMap 
-        setData={setMapCenter} 
-        data={mapCenter}
         markerData={markerData}
         onViewData={handleViewMarkerData}
+        setSensorBeingViewed={setSensorBeingViewed}
       />
       <Sidebar data={markerData}/>
       
