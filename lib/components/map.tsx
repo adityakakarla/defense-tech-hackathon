@@ -17,8 +17,8 @@ interface MapClickEvent {
 }
 
 const MapboxMap = ({
-  initialCenter = [-122.4, 37.8],
-  initialZoom = 14,
+  initialCenter = [-122.4, 37.85],
+  initialZoom = 13,
   markerInfo = [] as MarkerInfo[],
   onMapClick = (event: MapClickEvent) => {},
   mapStyle = 'mapbox://styles/mapbox/satellite-v9',
@@ -100,6 +100,11 @@ const MapboxMap = ({
         el.innerHTML = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="12" cy="12" r="10" fill="#40E0D0"/>
         <path d="M6 9L12 15L18 9" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px #000000) drop-shadow(0 0 2px #000000)"/>
+      </svg>`}
+      else if (marker.type === "Earthquake") {
+        el.innerHTML = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" fill="#FFD700"/>
+        <path d="M6 9L12 15L18 9" stroke="#000000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px #FFFFFF) drop-shadow(0 0 2px #FFFFFF)"/>
       </svg>`}
       
       const mapMarker = new mapboxgl.Marker(el)

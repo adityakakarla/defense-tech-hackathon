@@ -10,7 +10,8 @@ import {
   Compass,
   Wifi,
   Droplets,
-  Phone
+  Phone,
+  Zap
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -256,6 +257,52 @@ export default function DataViewer({
       })()}
     </div>
   );
+
+      case "Earthquake":
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Zap className="text-yellow-600" size={20} />
+              <h3 className="font-medium text-yellow-700">Earthquake Details</h3>
+            </div>
+            
+            <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-4">
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div className="bg-white p-3 rounded shadow-sm">
+                  <div className="text-xs text-gray-500">Date</div>
+                  <div className="font-medium">{sensor.data.date}</div>
+                </div>
+                <div className="bg-white p-3 rounded shadow-sm">
+                  <div className="text-xs text-gray-500">Time</div>
+                  <div className="font-medium">{sensor.data.time}</div>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between bg-yellow-100 p-3 rounded-lg mb-3">
+                <span className="text-sm font-medium">Magnitude</span>
+                <span className="text-xl font-bold text-yellow-700">
+                  {sensor.data.magnitude.toFixed(1)}
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white p-3 rounded shadow-sm">
+                  <div className="text-xs text-gray-500">Latitude</div>
+                  <div className="font-medium">{sensor.data.latitude.toFixed(4)}°</div>
+                </div>
+                <div className="bg-white p-3 rounded shadow-sm">
+                  <div className="text-xs text-gray-500">Longitude</div>
+                  <div className="font-medium">{sensor.data.longitude.toFixed(4)}°</div>
+                </div>
+              </div>
+              
+              <div className="mt-3 p-3 bg-white rounded shadow-sm">
+                <div className="text-xs text-gray-500 mb-1">Location</div>
+                <div className="text-sm">{sensor.data.location}</div>
+              </div>
+            </div>
+          </div>
+        );
 
       default:
         return (

@@ -43,6 +43,24 @@ export default function Home() {
       latitude: 37.805,
       longitude: -122.405,
       type: "Phone Call",
+    },
+    {
+      id: "marker-5",
+      latitude: 37.775,
+      longitude: -122.419,
+      type: "Phone Call",
+    },
+    {
+      id: "marker-6",
+      latitude: 37.783,
+      longitude: -122.408,
+      type: "Phone Call",
+    },
+    {
+      id: "marker-7",
+      latitude: 37.794,
+      longitude: -122.394,
+      type: "Phone Call",
     }
   ];
   
@@ -55,7 +73,7 @@ export default function Home() {
       longitude: -122.4,
       name: "Emergency Call",
       type: "Phone Call",
-      data: { transcript: "Building damange noted, please send help."},
+      data: { transcript: "Building damage noted, please send help."},
       color: "#FFFFFF"
     },
     {
@@ -75,19 +93,46 @@ export default function Home() {
     {
       id: "marker-3",
       type: "Phone Call",
-      latitude: 37.80,
+      latitude: 37.79,
       longitude: -122.4,
       name: "Emergency Call",
-      data: { transcript: "Someone is drowning" },
+      data: { transcript: "Multiple buildings shaking, possible earthquake" },
       color: "#FFFFFF"
     },
     {
       id: "marker-4",
       type: "Phone Call",
-      latitude: 37.80,
-      longitude: -122.4,
+      latitude: 37.805,
+      longitude: -122.405,
       name: "Emergency Call",
-      data: { transcript: "There's a fire in one of the skyscrapers." },
+      data: { transcript: "Reports of structural damage in downtown area" },
+      color: "#FFFFFF"
+    },
+    {
+      id: "marker-5",
+      type: "Phone Call",
+      latitude: 37.775,
+      longitude: -122.419,
+      name: "Emergency Call",
+      data: { transcript: "Power lines down after earthquake, sparks visible" },
+      color: "#FFFFFF"
+    },
+    {
+      id: "marker-6",
+      type: "Phone Call",
+      latitude: 37.783,
+      longitude: -122.408,
+      name: "Emergency Call",
+      data: { transcript: "Water main break reported after ground shaking" },
+      color: "#FFFFFF"
+    },
+    {
+      id: "marker-7",
+      type: "Phone Call",
+      latitude: 37.794,
+      longitude: -122.394,
+      name: "Emergency Call",
+      data: { transcript: "Multiple people trapped in collapsed building" },
       color: "#FFFFFF"
     }
   ]);
@@ -100,6 +145,49 @@ export default function Home() {
       setMarkerInfo(prevInfo => [...prevInfo, ...json])
     }
     fetchData()
+
+    // Fetch earthquake data
+    const fetchEarthquakeData = async () => {
+      try {
+        const response = await fetch('/api/earthquakes')
+        const earthquakes = await response.json()
+        
+        // Create marker data for each earthquake
+        const earthquakeMarkers = earthquakes.map((quake: any, index: number) => {
+          const id = `earthquake-${index}`
+          return {
+            id,
+            latitude: quake.latitude,
+            longitude: quake.longitude,
+            name: `M${quake.magnitude.toFixed(1)} Earthquake`,
+            type: "Earthquake",
+            data: {
+              ...quake,
+              eventType: "Earthquake"
+            },
+            color: "#FFD700" // Yellow color for earthquakes
+          }
+        })
+        
+        // Add earthquake markers to existing markers
+        setMarkerData(prevData => [...prevData, ...earthquakeMarkers])
+        
+        // Add basic marker info for the map
+        const earthquakeMapMarkers = earthquakes.map((quake: any, index: number) => {
+          return {
+            id: `earthquake-${index}`,
+            latitude: quake.latitude,
+            longitude: quake.longitude,
+            type: "Earthquake"
+          }
+        })
+        
+        setMarkerInfo(prevInfo => [...prevInfo, ...earthquakeMapMarkers])
+      } catch (error) {
+        console.error('Error fetching earthquake data:', error)
+      }
+    }
+    fetchEarthquakeData()
   }, [])
 
   useEffect(() => {

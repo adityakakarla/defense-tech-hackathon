@@ -11,7 +11,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-
+import ReactMarkdown from 'react-markdown'
+import type { Components } from 'react-markdown'
 
 export default function Sidebar({ data }: { data: any }) {
     const [isExpanded, setIsExpanded] = useState(false)
@@ -116,7 +117,6 @@ export default function Sidebar({ data }: { data: any }) {
         };
     }, [isExpanded]);
 
-
     return (
         <div className="flex h-screen">
             {/* Resize handle - positioned on left side */}
@@ -186,11 +186,56 @@ export default function Sidebar({ data }: { data: any }) {
 
                 {isExpanded && (
                     <div className="flex flex-col flex-1 h-[calc(100vh-3.5rem)] overflow-hidden">
-                        <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-2">
+                        <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-3">
                             {messages.map(message => (
-                                <div key={message.id} className="border border-black p-2 text-wrap">
-                                    {message.role === 'user' ? 'User: ' : 'AI: '}
-                                    {message.content}
+                                <div 
+                                    key={message.id} 
+                                    className={`border p-3 rounded-lg shadow-sm ${
+                                        message.role === 'user' 
+                                            ? 'border-gray-300 bg-white' 
+                                            : 'border-l-4 border-blue-400 border-r border-t border-b bg-white'
+                                    }`}
+                                >
+                                    <div className={`font-semibold mb-1 text-sm ${
+                                        message.role === 'user' 
+                                            ? 'text-gray-700' 
+                                            : 'text-blue-700'
+                                    }`}>
+                                        {message.role === 'user' ? 'You' : 'Assistant'}
+                                    </div>
+                                    {message.role === 'user' ? (
+                                        <div className="whitespace-pre-wrap text-sm">{message.content}</div>
+                                    ) : (
+                                        <div className="text-sm">
+                                            <ReactMarkdown 
+                                                components={{
+                                                    // Basic list styling
+                                                    ul: ({node, children, ...props}) => <ul className="list-disc pl-4 mb-2 mt-1" {...props}>{children}</ul>,
+                                                    ol: ({node, children, ...props}) => <ol className="list-decimal pl-4 mb-2 mt-1" {...props}>{children}</ol>,
+                                                    li: ({node, children, ...props}) => <li className="mb-1" {...props}>{children}</li>,
+                                                    // Simple code styling
+                                                    code: ({node, inline, children, ...props}: any) => 
+                                                        inline ? 
+                                                            <code className="bg-gray-100 px-1 py-0.5 rounded font-mono" {...props}>{children}</code> : 
+                                                            <pre className="bg-gray-100 p-2 rounded font-mono whitespace-pre-wrap overflow-x-auto my-2"><code {...props}>{children}</code></pre>,
+                                                    // Simple heading styling
+                                                    h1: ({node, children, ...props}) => <h1 className="text-xl font-bold mt-3 mb-2" {...props}>{children}</h1>,
+                                                    h2: ({node, children, ...props}) => <h2 className="text-lg font-bold mt-3 mb-2" {...props}>{children}</h2>,
+                                                    h3: ({node, children, ...props}) => <h3 className="text-base font-bold mt-2 mb-1" {...props}>{children}</h3>,
+                                                    // Simple paragraph styling
+                                                    p: ({node, children, ...props}) => <p className="mb-2" {...props}>{children}</p>,
+                                                    // Simple blockquote styling
+                                                    blockquote: ({node, children, ...props}) => <blockquote className="border-l-4 border-gray-300 pl-2 py-1 italic text-gray-700 my-2" {...props}>{children}</blockquote>,
+                                                    // Bold text
+                                                    strong: ({node, children, ...props}) => <strong className="font-bold" {...props}>{children}</strong>,
+                                                    // Italic text
+                                                    em: ({node, children, ...props}) => <em className="italic" {...props}>{children}</em>
+                                                }}
+                                            >
+                                                {message.content}
+                                            </ReactMarkdown>
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                         </div>
