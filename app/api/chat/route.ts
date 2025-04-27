@@ -26,9 +26,9 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model: sdkModel,
-    system: `Data is provided. If the user needs to know more about the data, use the data to answer the question. Do not respond in Markdown, only text. use newline characters freely.
-    You must reply concisely and you must not respond in Markdown, otherwise you will be punished. Please respond very concisely. You do not need to use all of the data.
-    please utilize tools as needed to answer the user question`,
+    system: `Data is provided. If the user needs to know more about the data, use the data to answer the question.
+    You will be punished if you respond in Markdown, so please respond in text. Be concise. Prioritize number of lives saved.
+    Be specific and concise, otherwise you fail. Long repsonses will risk human life.`,
     messages
   });
 

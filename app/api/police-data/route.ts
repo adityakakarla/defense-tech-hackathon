@@ -9,10 +9,12 @@ export async function GET(request: Request) {
         policeData.push(...json)
     }
 
-    const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString().replace('Z', '.000');
+    const twelveHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString().replace('Z', '.000');
     
     policeData = policeData.filter((item) => 
-        ['AUDIBLE ALARM', 'TRAFFIC HAZARD', 'FIRE'].includes(item.call_type_original_desc)
+        ['AUDIBLE ALARM', 'TRAFFIC HAZARD', 'FIRE',
+            'SUSPICIOUS PERSON', 'SUSPICIOUS VEHICLE'
+        ].includes(item.call_type_original_desc)
      && item.intersection_point != null
      && item.dispatch_datetime > twelveHoursAgo
     )

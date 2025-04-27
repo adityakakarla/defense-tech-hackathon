@@ -16,8 +16,9 @@ interface MarkerData {
 }
 
 export default function Home() {
-  const [policeData, setPoliceData] = useState<any[]>([])
   const [sensorBeingViewed, setSensorBeingViewed] = useState<number>(-1);
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [connected, setConnected] = useState(false);
   const initialMarkers = [
     {
       id: "marker-1",
@@ -27,15 +28,21 @@ export default function Home() {
     },
     {
       id: "marker-2",
-      type: "SDR Sensor",
+      type: "Sensor",
       latitude: 37.8248,
       longitude: -122.37,
     },
     {
       id: "marker-3",
-      type: "Ultrasonic Wind Sensor",
-      latitude: 37.81,
-      longitude: -122.39,
+      latitude: 37.79,
+      longitude: -122.4,
+      type: "Phone Call",
+    },
+    {
+      id: "marker-4",
+      latitude: 37.805,
+      longitude: -122.405,
+      type: "Phone Call",
     }
   ];
   
@@ -48,7 +55,7 @@ export default function Home() {
       longitude: -122.4,
       name: "Emergency Call",
       type: "Phone Call",
-      data: { transcript: "There's a weird ship coming towards us, it's not a cruise ship."},
+      data: { transcript: "Building damange noted, please send help."},
       color: "#FFFFFF"
     },
     {
@@ -56,17 +63,31 @@ export default function Home() {
       latitude: 37.8248,
       longitude: -122.37,
       name: "Yerba Buena Island",
-      type: "SDR Sensor",
-      data: { frequency: 900},
+      type: "Sensor",
+      data: { frequency: 900,
+        windSpeed: 15,
+        direction: 100,
+        temperature: 20,
+        humidity: 50
+      },
       color: "#FFFFFF"
     },
     {
       id: "marker-3",
-      latitude: 37.81,
-      longitude: -122.39,
-      name: "San Francisco Bay Sensor 3",
-      type: "Ultrasonic Wind Sensor",
-      data: { windSpeed: 15},
+      type: "Phone Call",
+      latitude: 37.80,
+      longitude: -122.4,
+      name: "Emergency Call",
+      data: { transcript: "Someone is drowning" },
+      color: "#FFFFFF"
+    },
+    {
+      id: "marker-4",
+      type: "Phone Call",
+      latitude: 37.80,
+      longitude: -122.4,
+      name: "Emergency Call",
+      data: { transcript: "There's a fire in one of the skyscrapers." },
       color: "#FFFFFF"
     }
   ]);
@@ -81,31 +102,80 @@ export default function Home() {
     fetchData()
   }, [])
 
-  // Update wind speed data every 500ms (half a second)
   useEffect(() => {
-    const intervalId = setInterval(() => {
+    if (typeof window !== 'undefined') {
+      const ws = new WebSocket('ws://127.0.0.1:8766');
+      
+      ws.onopen = () => {
+        console.log('WebSocket connection established');
+        setConnected(true);
+        setSocket(ws);
+      };
+      
+      ws.onmessage = (event) => {
+        try {
+          const receivedData = JSON.parse(event.data)
+          console.log('Received data:', receivedData);
+          updateMarkerData(receivedData.id, receivedData)
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
+        }
+      };
+      
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+      
+      ws.onclose = () => {
+        console.log('WebSocket connection closed');
+        setConnected(false);
+      };
+      
+      return () => {
+        ws.close();
+      };
+    }
+  }, []);
+
+  const updateMarkerData = (id: string, data: any) => {
+    if(id === 'marker-2'){
       setMarkerData(prevData => {
         return prevData.map(marker => {
-          // Only update the wind speed sensor (marker-3)
-          if (marker.id === "marker-3") {
-            // Generate random wind speed between 0 and 30
-            const randomWindSpeed = Math.round(Math.random() * 30);
+          if (marker.id === id) {
             return {
-              ...marker,
-              data: { 
-                ...marker.data,
-                windSpeed: randomWindSpeed
+              'id': marker.id,
+              'latitude': data.lat,
+              'longitude': data.long,
+              'name': marker.name,
+              'type': marker.type,
+              'data': {
+                'frequency': data.radio,
+                'windSpeed': data.wind,
+                'direction': data.direction,
+                'temperature': data.temperature,
+                'humidity': data.humidity
               }
-            };
+            }
           }
           return marker;
         });
       });
-    }, 500); // 500ms = half a second
 
-    // Clean up interval on component unmount
-    return () => clearInterval(intervalId);
-  }, []);
+      setMarkerInfo(prevInfo => {
+        return prevInfo.map(marker => {
+          if (marker.id === id) {
+            return {
+              'id': marker.id,
+              'latitude': data.lat,
+              'longitude': data.long,
+              'type': marker.type
+            }
+          }
+          return marker;
+        });
+      });
+    }
+  };
 
   return (
     <div className="h-screen w-full flex relative">

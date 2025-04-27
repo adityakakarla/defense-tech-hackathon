@@ -1,8 +1,20 @@
 "use client"
 
-import { Wind, Phone, Radio, AlertCircle } from "lucide-react"
+import { 
+  AlertCircle, 
+  MapPin, 
+  Radio, 
+  Wind, 
+  Thermometer,
+  Navigation,
+  Compass,
+  Wifi,
+  Droplets,
+  Phone
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { useState } from "react"
 
 type SensorData = {
   id: string
@@ -97,140 +109,153 @@ export default function DataViewer({
           </div>
         )
 
-      case "SDR Sensor":
-        const frequency = sensor.data.frequency || 0
-        // Calculate a normalized value for visualization
-        const normalizedFreq = Math.min(100, (frequency / 1000) * 100)
-
-        return (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Radio className="text-purple-600" size={20} />
-              <h3 className="font-medium text-purple-600">Radio Frequency</h3>
-            </div>
-            <div className="bg-purple-50 border border-purple-100 rounded-lg p-5">
-              <div className="flex flex-col gap-4">
-                <div className="flex justify-between items-baseline">
-                  <span className="text-sm text-purple-700">Current Frequency</span>
-                  <span className="text-2xl font-bold text-purple-700">
-                    {frequency} <span className="text-sm font-normal">MHz</span>
-                  </span>
-                </div>
-
-                <div className="mt-2">
-                  <div className="flex justify-between text-xs text-purple-600 mb-1">
-                    <span>0 MHz</span>
-                    <span>1000 MHz</span>
+        case "Sensor":
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <AlertCircle className="text-blue-600" size={20} />
+        <h3 className="font-medium text-blue-700">Sensor Data</h3>
+      </div>
+      
+      {/* Tabs Component */}
+      {(() => {
+        const [activeTab, setActiveTab] = useState(1);
+        const { data } = sensor;
+        
+        // Tab content definitions
+        const tabContents = {
+          1: (
+            <div className="bg-white rounded-lg p-4 shadow border-l-4 border-green-500">
+              <div className="flex items-center gap-2 mb-3">
+                <MapPin className="text-green-600" size={18} />
+                <h4 className="font-medium text-gray-700">Location</h4>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-gray-50 p-3 rounded hover:bg-green-50 transition-colors">
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
+                    <Compass size={14} /> 
+                    <p>Latitude</p>
                   </div>
-                  <div className="h-3 w-full bg-purple-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-purple-600 rounded-full transition-all duration-300"
-                      style={{ width: `${normalizedFreq}%` }}
-                    />
-                  </div>
+                  <p className="font-medium text-green-700">{sensor.latitude.toFixed(4)}°</p>
                 </div>
-
-                <div className="flex justify-between items-center mt-2">
-                  <Badge variant="outline" className="bg-white text-purple-700 border-purple-200">
-                    {frequency < 300 ? "Low Band" : frequency < 700 ? "Mid Band" : "High Band"}
-                  </Badge>
-                  <span className="text-xs text-purple-600">Sensor ID: {sensor.id}</span>
+                <div className="bg-gray-50 p-3 rounded hover:bg-green-50 transition-colors">
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
+                    <Compass size={14} /> 
+                    <p>Longitude</p>
+                  </div>
+                  <p className="font-medium text-green-700">{sensor.longitude.toFixed(4)}°</p>
                 </div>
               </div>
             </div>
-          </div>
-        )
-
-      case "Ultrasonic Wind Sensor":
-        const windSpeed = sensor.data.windSpeed || 0
-        // Calculate a normalized value for visualization
-        const normalizedWind = Math.min(100, (windSpeed / 30) * 100)
-
-        // Determine wind category and color
-        let windCategory, windColorClass
-        if (windSpeed < 5) {
-          windCategory = "Calm"
-          windColorClass = "text-green-600"
-        } else if (windSpeed < 15) {
-          windCategory = "Moderate"
-          windColorClass = "text-amber-600"
-        } else if (windSpeed < 25) {
-          windCategory = "Strong"
-          windColorClass = "text-orange-600"
-        } else {
-          windCategory = "Severe"
-          windColorClass = "text-red-600"
-        }
-
-        return (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Wind className="text-teal-600" size={20} />
-              <h3 className="font-medium text-teal-600">Wind Speed</h3>
-            </div>
-            <div className="bg-teal-50 border border-teal-100 rounded-lg p-5">
-              <div className="flex flex-col gap-4">
-                <div className="flex justify-between items-baseline">
-                  <span className="text-sm text-teal-700">Current Speed</span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-teal-700">{windSpeed}</span>
-                    <span className="text-sm font-normal text-teal-600">mph</span>
-                  </div>
+          ),
+          2: (
+            <div className="bg-white rounded-lg p-4 shadow border-l-4 border-purple-500">
+              <div className="flex items-center gap-2 mb-3">
+                <Radio className="text-purple-600" size={18} />
+                <h4 className="font-medium text-gray-700">Frequency</h4>
+              </div>
+              <div className="bg-gray-50 p-3 rounded hover:bg-purple-50 transition-colors">
+                <div className="flex items-center gap-1 text-sm text-gray-500">
+                  <Wifi size={14} /> 
+                  <p>Signal Frequency</p>
                 </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="relative w-24 h-24 flex-shrink-0">
-                    <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
-                      <circle cx="50" cy="50" r="45" fill="none" stroke="#99e6e6" strokeWidth="10" />
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="45"
-                        fill="none"
-                        stroke="#0d9488"
-                        strokeWidth="10"
-                        strokeDasharray={`${normalizedWind * 2.83} 283`}
-                        className="transition-all duration-300"
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Wind className={`h-8 w-8 ${windColorClass}`} />
-                    </div>
-                  </div>
-
-                  <div className="flex-1">
-                    <div className="flex flex-col gap-1">
-                      <Badge
-                        className={`self-start ${
-                          windSpeed < 5
-                            ? "bg-green-100 text-green-700"
-                            : windSpeed < 15
-                              ? "bg-amber-100 text-amber-700"
-                              : windSpeed < 25
-                                ? "bg-orange-100 text-orange-700"
-                                : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {windCategory}
-                      </Badge>
-                      <div className="text-sm text-teal-700 mt-1">
-                        {windSpeed < 5
-                          ? "Light breeze, minimal impact"
-                          : windSpeed < 15
-                            ? "Moderate wind, noticeable movement"
-                            : windSpeed < 25
-                              ? "Strong wind, significant movement"
-                              : "Severe wind, potential hazard"}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-xs text-teal-600 text-right mt-1">Sensor ID: {sensor.id}</div>
+                <p className="font-medium text-purple-700">{data.frequency} MHz</p>
               </div>
             </div>
-          </div>
-        )
+          ),
+          3: (
+            <div className="bg-white rounded-lg p-4 shadow border-l-4 border-blue-500">
+              <div className="flex items-center gap-2 mb-3">
+                <Wind className="text-blue-600" size={18} />
+                <h4 className="font-medium text-gray-700">Wind Data</h4>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-gray-50 p-3 rounded hover:bg-blue-50 transition-colors">
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
+                    <Wind size={14} /> 
+                    <p>Wind Speed</p>
+                  </div>
+                  <p className="font-medium text-blue-700">{data.windSpeed.toFixed(2)} mph</p>
+                </div>
+                <div className="bg-gray-50 p-3 rounded hover:bg-blue-50 transition-colors">
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
+                    <Navigation size={14} /> 
+                    <p>Direction</p>
+                  </div>
+                  <p className="font-medium text-blue-700">{data.direction.toFixed(2)}°</p>
+                </div>
+              </div>
+            </div>
+          ),
+          4: (
+            <div className="bg-white rounded-lg p-4 shadow border-l-4 border-amber-500">
+              <div className="flex items-center gap-2 mb-3">
+                <Thermometer className="text-amber-600" size={18} />
+                <h4 className="font-medium text-gray-700">Atmospheric Data</h4>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-gray-50 p-3 rounded hover:bg-amber-50 transition-colors">
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
+                    <Thermometer size={14} /> 
+                    <p>Temperature</p>
+                  </div>
+                  <p className="font-medium text-amber-700">{data.temperature.toFixed(2)}°C</p>
+                </div>
+                <div className="bg-gray-50 p-3 rounded hover:bg-amber-50 transition-colors">
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
+                    <Droplets size={14} /> 
+                    <p>Humidity</p>
+                  </div>
+                  <p className="font-medium text-amber-700">{data.humidity.toFixed(2)}%</p>
+                </div>
+              </div>
+            </div>
+          )
+        };
+        
+        return (
+          <>
+            {/* Tab Navigation */}
+            <div className="flex space-x-1 border-b">
+              <button 
+                className={`flex items-center gap-1 p-1 text-sm font-medium ${activeTab === 1 ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-500 hover:text-gray-700'}`} 
+                onClick={() => setActiveTab(1)}
+              >
+                <MapPin size={16} />
+                Location
+              </button>
+              <button 
+                className={`flex items-center gap-1 p-1 text-sm font-medium ${activeTab === 2 ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500 hover:text-gray-700'}`}
+                onClick={() => setActiveTab(2)}
+              >
+                <Radio size={16} />
+                Frequency
+              </button>
+              <button 
+                className={`flex items-center gap-1 p-1 text-sm font-medium ${activeTab === 3 ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                onClick={() => setActiveTab(3)}
+              >
+                <Wind size={16} />
+                Wind
+              </button>
+              <button 
+                className={`flex items-center gap-1 p-1 text-sm font-medium ${activeTab === 4 ? 'text-amber-600 border-b-2 border-amber-600' : 'text-gray-500 hover:text-gray-700'}`}
+                onClick={() => setActiveTab(4)}
+              >
+                <Thermometer size={16} />
+                Weather
+              </button>
+            </div>
+            
+            {/* Tab Content */}
+            <div className="pt-2">
+              {tabContents[activeTab as keyof typeof tabContents]}
+            </div>
+          </>
+        );
+      })()}
+    </div>
+  );
 
       default:
         return (
@@ -259,17 +284,15 @@ export default function DataViewer({
             <Badge variant="secondary" className="flex items-center gap-1.5">
               {sensor.type === "Phone Call" ? (
                 <Phone className="h-3.5 w-3.5" />
-              ) : sensor.type === "SDR Sensor" ? (
+              ) : sensor.type === "Sensor" ? (
                 <Radio className="h-3.5 w-3.5" />
-              ) : sensor.type === "Ultrasonic Wind Sensor" ? (
-                <Wind className="h-3.5 w-3.5" />
               ) : (
                 <AlertCircle className="h-3.5 w-3.5" />
               )}
               <span>{sensor.type}</span>
             </Badge>
             <span className="text-xs text-muted-foreground">
-              {sensor.latitude.toFixed(4)}, {sensor.longitude.toFixed(4)}
+              {sensor.latitude?.toFixed(4)}, {sensor.longitude?.toFixed(4)}
             </span>
           </div>
         </div>

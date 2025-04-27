@@ -18,7 +18,7 @@ interface MapClickEvent {
 
 const MapboxMap = ({
   initialCenter = [-122.4, 37.8],
-  initialZoom = 12,
+  initialZoom = 14,
   markerInfo = [] as MarkerInfo[],
   onMapClick = (event: MapClickEvent) => {},
   mapStyle = 'mapbox://styles/mapbox/satellite-v9',
@@ -91,12 +91,12 @@ const MapboxMap = ({
         <circle cx="12" cy="12" r="10" fill="#FF0000"/>
         <path d="M6 9L12 15L18 9" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px #000000) drop-shadow(0 0 2px #000000)"/>
       </svg>`}
-      else if (marker.type === "SDR Sensor") {
+      else if (marker.type === "SDR Sensor" || marker.type === "Sensor") {
         el.innerHTML = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="12" cy="12" r="10" fill="#800080"/>
         <path d="M6 9L12 15L18 9" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px #000000) drop-shadow(0 0 2px #000000)"/>
       </svg>`}
-      else if (marker.type === "Ultrasonic Wind Sensor") {
+      else if (marker.type === "Ultrasonic Wind Sensor" || marker.type === 'Atmospheric Sensor') {
         el.innerHTML = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="12" cy="12" r="10" fill="#40E0D0"/>
         <path d="M6 9L12 15L18 9" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px #000000) drop-shadow(0 0 2px #000000)"/>
