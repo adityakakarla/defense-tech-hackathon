@@ -17,6 +17,8 @@
 /.next/
 /out/
 
+test.ipynb
+
 # production
 /build
 

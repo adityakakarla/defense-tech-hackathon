@@ -18,7 +18,19 @@ export async function POST(req: NextRequest) {
     messages: [
         {
         role: "user",
-        content: "based on the message, generate a course of action recommendation. speak fast, frantically, worried, urgent. very urgent. text: " + text
+        content: `based on the message, generate a course of action recommendation.
+        
+speak fast, frantically, worried, urgent. very urgent. should sound like an emergency radio message.
+
+follow this format with your response:
+1. who you're trying to reach
+2. who you are
+3. what the messsage is
+4. an end of message (contains request for acknowledgement)
+
+example: Calling Patrol, this is Base. Caller 3 has fifteen minutes until the water level reaches them. Prioritize pulling them out. Over.
+
+text:` + text
         }
     ],
     store: true,
