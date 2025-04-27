@@ -47,18 +47,45 @@ export default function DataViewer({
         return (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Phone className="text-blue-600" size={20} />
-              <h3 className="font-medium text-blue-600">Call Transcript</h3>
+              <Phone className="text-red-600" size={20} />
+              <h3 className="font-medium text-red-600">Call Transcript</h3>
             </div>
-            <div className="bg-blue-50 border border-blue-100 rounded-lg p-5">
+            <div className="bg-red-50 border border-red-100 rounded-lg p-5">
               <div className="flex flex-col gap-3">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <Phone className="h-4 w-4 text-blue-600" />
+                  <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <Phone className="h-4 w-4 text-red-600" />
                   </div>
-                  <div className="bg-white rounded-lg p-3 shadow-sm border border-blue-100 flex-1">
+                  <div className="bg-white rounded-lg p-3 shadow-sm border border-red-100 flex-1">
                     {sensor.data.transcript ? (
                       <p className="text-gray-700">{sensor.data.transcript}</p>
+                    ) : (
+                      <p className="text-gray-500 italic">No transcript available</p>
+                    )}
+                  </div>
+                </div>
+                <div className="text-xs text-gray-500 text-right">Call ID: {sensor.id}</div>
+              </div>
+            </div>
+          </div>
+        )
+
+        case "Police Call":
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Phone className="text-red-600" size={20} />
+              <h3 className="font-medium text-red-600">Call Transcript</h3>
+            </div>
+            <div className="bg-red-50 border border-red-100 rounded-lg p-5">
+              <div className="flex flex-col gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <Phone className="h-4 w-4 text-red-600" />
+                  </div>
+                  <div className="bg-white rounded-lg p-3 shadow-sm border border-red-100 flex-1">
+                    {sensor.data.issue ? (
+                      <p className="text-gray-700">{sensor.data.issue}</p>
                     ) : (
                       <p className="text-gray-500 italic">No transcript available</p>
                     )}

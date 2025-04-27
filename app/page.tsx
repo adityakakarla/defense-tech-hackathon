@@ -4,7 +4,7 @@ import MapboxMap from "@/lib/components/map";
 import Sidebar from "@/lib/components/sidebar";
 import { useState, useEffect } from "react";
 import DataViewer from "@/lib/components/data-viewer";
-
+import Stats from "@/lib/components/stats";
 interface MarkerData {
   id?: string;
   latitude: number;
@@ -16,24 +16,30 @@ interface MarkerData {
 }
 
 export default function Home() {
+  const [policeData, setPoliceData] = useState<any[]>([])
   const [sensorBeingViewed, setSensorBeingViewed] = useState<number>(-1);
-  const markerInfo = [
+  const initialMarkers = [
     {
       id: "marker-1",
       latitude: 37.8,
       longitude: -122.4,
+      type: "Phone Call",
     },
     {
       id: "marker-2",
+      type: "SDR Sensor",
       latitude: 37.8248,
       longitude: -122.37,
     },
     {
       id: "marker-3",
+      type: "Ultrasonic Wind Sensor",
       latitude: 37.81,
       longitude: -122.39,
     }
   ];
+  
+  const [markerInfo, setMarkerInfo] = useState(initialMarkers);
   
   const [markerData, setMarkerData] = useState<any[]>([
     {
@@ -42,7 +48,7 @@ export default function Home() {
       longitude: -122.4,
       name: "Emergency Call",
       type: "Phone Call",
-      data: { transcript: "hi"},
+      data: { transcript: "There's a weird ship coming towards us, it's not a cruise ship."},
       color: "#FFFFFF"
     },
     {
@@ -64,6 +70,16 @@ export default function Home() {
       color: "#FFFFFF"
     }
   ]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await fetch('/api/police-data')
+      const json = await data.json()
+      setMarkerData(prevData => [...prevData, ...json])
+      setMarkerInfo(prevInfo => [...prevInfo, ...json])
+    }
+    fetchData()
+  }, [])
 
   // Update wind speed data every 500ms (half a second)
   useEffect(() => {
@@ -99,6 +115,7 @@ export default function Home() {
       />
       <Sidebar data={markerData}/>
       <DataViewer sensorBeingViewed={sensorBeingViewed} markerData={markerData}/>
+      <Stats />
     </div>
   );
 }

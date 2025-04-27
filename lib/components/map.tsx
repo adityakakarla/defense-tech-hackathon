@@ -8,6 +8,7 @@ interface MarkerInfo {
   id?: string;
   latitude: number;
   longitude: number;
+  type: string;
 }
 
 interface MapClickEvent {
@@ -73,50 +74,52 @@ const MapboxMap = ({
     };
   }, []);
 
-  // Function to add markers to the map
   const addMarkersToMap = () => {
     if (!map.current || !mapLoaded) return;
     
-    // Clear existing markers
     Object.values(markerRefs.current).forEach(marker => marker.remove());
     markerRefs.current = {};
     
-    // Add new markers
     markerInfo.forEach((marker, index) => {
       const id = marker.id || `marker-${index}`;
       
-      // Create a custom element for the chevron marker
       const el = document.createElement('div');
       el.className = 'custom-marker chevron-down';
+        
+      if (marker.type === "Phone Call" || marker.type === "Police Call") {
       el.innerHTML = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" fill="#FF0000"/>
         <path d="M6 9L12 15L18 9" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px #000000) drop-shadow(0 0 2px #000000)"/>
-      </svg>`;
+      </svg>`}
+      else if (marker.type === "SDR Sensor") {
+        el.innerHTML = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" fill="#800080"/>
+        <path d="M6 9L12 15L18 9" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px #000000) drop-shadow(0 0 2px #000000)"/>
+      </svg>`}
+      else if (marker.type === "Ultrasonic Wind Sensor") {
+        el.innerHTML = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" fill="#40E0D0"/>
+        <path d="M6 9L12 15L18 9" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px #000000) drop-shadow(0 0 2px #000000)"/>
+      </svg>`}
       
-      // Create and add the marker to the map
       const mapMarker = new mapboxgl.Marker(el)
         .setLngLat([marker.longitude, marker.latitude])
         .addTo(map.current!);
       
-      // Add click event to set the sensor being viewed
       el.addEventListener('click', () => {
         setSensorBeingViewed(index);
       });
       
-      // Store reference to the marker
       markerRefs.current[id] = mapMarker;
     });
   };
 
-  // Call addMarkersToMap when map is loaded or markerInfo changes
   useEffect(() => {
     addMarkersToMap();
   }, [mapLoaded, markerInfo]);
 
   return (
     <div className="relative h-full w-full">
-      {/* <div className="absolute top-2 left-2 bg-white text-black bg-opacity-75 p-2 rounded z-10 text-sm">
-        Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-      </div> */}
       <div ref={mapContainer} className="w-full h-full" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
       <style jsx global>{`
         .mapboxgl-ctrl-bottom-right, .mapboxgl-ctrl-bottom-left {
