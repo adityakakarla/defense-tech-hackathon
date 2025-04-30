@@ -192,7 +192,7 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const ws = new WebSocket('ws://127.0.0.1:8766');
+      const ws = new WebSocket('ws://10.1.63.75:8766');
       
       ws.onopen = () => {
         console.log('WebSocket connection established');

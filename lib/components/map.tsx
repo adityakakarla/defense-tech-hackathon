@@ -17,7 +17,7 @@ interface MapClickEvent {
 }
 
 const MapboxMap = ({
-  initialCenter = [-122.4, 37.85],
+  initialCenter = [-122.4, 37.797],
   initialZoom = 13,
   markerInfo = [] as MarkerInfo[],
   onMapClick = (event: MapClickEvent) => {},
